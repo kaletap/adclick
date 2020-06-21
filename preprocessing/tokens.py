@@ -36,4 +36,6 @@ class Tokenize:
         tokens_list = features[self.name]
         tokens_list = tf.strings.split(tokens_list, sep="|").to_tensor(default_value="<PAD>", shape=[None, self.max_length])
         # hashing instead of proper vocabulary
-        return tf.strings.to_hash_bucket_fast(tokens_list, num_buckets=self.vocab_size)
+        tokens = tf.strings.to_hash_bucket_fast(tokens_list, num_buckets=self.vocab_size)
+        features[self.name] = tokens
+        return features, labels

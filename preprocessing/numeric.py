@@ -28,18 +28,20 @@ class PackNumericFeatures:
         numeric_features = [features.pop(name) for name in self.names]
         numeric_features = [tf.cast(feat, tf.float32) for feat in numeric_features]
         numeric_features = tf.stack(numeric_features, axis=-1)
-
-        return numeric_features
+        features["numeric"] = numeric_features
+        return features, labels
 
 
 class Normalize:
     def __init__(self, names):
         self.names = names
 
-    def __call__(self, data):
+    def __call__(self, features, labels):
+        data = features["numeric"]
         mean = stats.loc["mean", self.names]
         std = stats.loc["sd", self.names]
-        return (data - mean) / std
+        features["numeric"] = (data - mean) / std
+        return features, labels
 
 #
 # numeric_layer = tf.keras.layers.DenseFeatures(feature_columns)
