@@ -13,6 +13,13 @@ def get_stats(column):
     return rows["mean"].values[0], rows["sd"].values[0]
 
 
+# Label transformer
+class ExtractLabels:
+    def __call__(self, features, labels):
+        return labels
+
+
+# Numeric variables transformers
 class PackNumericFeatures:
     def __init__(self, names):
         self.names = names
@@ -21,18 +28,18 @@ class PackNumericFeatures:
         numeric_features = [features.pop(name) for name in self.names]
         numeric_features = [tf.cast(feat, tf.float32) for feat in numeric_features]
         numeric_features = tf.stack(numeric_features, axis=-1)
-        features['numeric'] = numeric_features
 
-        return features, labels
+        return numeric_features
 
 
-def get_normalize_function(numeric_features):
-    def normalize(data):
-        mean = stats.loc["mean", numeric_features]
-        std = stats.loc["sd", numeric_features]
+class Normalize:
+    def __init__(self, names):
+        self.names = names
+
+    def __call__(self, data):
+        mean = stats.loc["mean", self.names]
+        std = stats.loc["sd", self.names]
         return (data - mean) / std
-    return normalize
-
 
 #
 # numeric_layer = tf.keras.layers.DenseFeatures(feature_columns)
