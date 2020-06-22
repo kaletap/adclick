@@ -43,22 +43,21 @@ class Normalize:
         features["numeric"] = (data - mean) / std
         return features, labels
 
-#
-# numeric_layer = tf.keras.layers.DenseFeatures(feature_columns)
-# embedding_layer = tf.keras.layers.DenseFeatures(embedding_columns)
-#
-# x = tf.keras.Input(shape=4)
-# x_num = numeric_layer(x)
-# x_num = tf.keras.layers.Dense(512, activation="relu")
-#
-# x_emb = embedding_layer(x)
-# x = tf.keras.layers.Concatenate([x_num, x_emb])
-# x = tf.keras.layers.Dense(256, activation="relu")
-# x = tf.keras.layers.Dense(1, activation="sigmoid")
-#
-# model.compile(
-#     optimizer=tf.keras.optimizers.Adam(lr=lr),
-#     loss=tf.keras.losses.BinaryCrossentropy(),
-#     metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
-# )
-# history = model.fit(packed_train, validation_data=packed_test, epochs=10, callbacks=[scheduler])
+
+class Categorize:
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+
+    def __call__(self, features, labels):
+        features[self.name] = tf.one_hot(features[self.name], self.size)
+        return features, labels
+
+
+class FeatureHash:
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+
+    def __call__(self, features, labels):
+        pass
