@@ -25,7 +25,7 @@ class PackNumericFeatures:
         self.names = names
 
     def __call__(self, features, labels):
-        numeric_features = [features.pop(name) for name in self.names]
+        numeric_features = [features[name] for name in self.names]
         numeric_features = [tf.cast(feat, tf.float32) for feat in numeric_features]
         numeric_features = tf.stack(numeric_features, axis=-1)
         features["numeric"] = numeric_features
@@ -55,9 +55,12 @@ class Categorize:
 
 
 class FeatureHash:
-    def __init__(self, name, size):
+    def __init__(self, name: str, n_buckets: int = 1000):
         self.name = name
-        self.size = size
+        self.n_buckets = n_buckets
 
     def __call__(self, features, labels):
-        pass
+        ids = tf.as_string(features[self.name])
+        ids = tf.strings.to_hash_bucket_fast(ids, self.n_buckets)
+        features[self.name + "_hashed"] = ids
+        return features, labels
