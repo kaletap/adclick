@@ -64,3 +64,16 @@ class FeatureHash:
         ids = tf.strings.to_hash_bucket_fast(ids, self.n_buckets)
         features[self.name + "_hashed"] = ids
         return features, labels
+
+
+class FeatureHashMany:
+    def __init__(self, names: str, n_buckets: int = 1000):
+        self.names = names
+        self.n_buckets = n_buckets
+
+    def __call__(self, features, labels):
+        for name in self.names:
+            ids = tf.as_string(features[name])
+            ids = tf.strings.to_hash_bucket_fast(ids, self.n_buckets)
+            features[name + "_hashed"] = ids
+        return features, labels
